@@ -36,6 +36,9 @@ const reviewSchema = new mongoose.Schema(
     }
   }
 );
+//need the index to to get user review in tour quickly
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 reviewSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'user',
@@ -59,14 +62,12 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
     }
   ]);
   if (stats.length === 0) {
-
     Tour.findByIdAndUpdate(tourId, {
       averageRating: 4.5, //default rating
       ratingsQuantity: 0
     });
   } else
   {
-
     Tour.findByIdAndUpdate(tourId, {
       averageRating: stats[0].averageRating,
       ratingsQuantity: stats[0].numRating
