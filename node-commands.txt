@@ -1,0 +1,5 @@
+run dev environment: npm run start:dev
+
+run script to Delete data in DB: node ./dev-data/data/import-dev-data.js --delete
+
+run script to import data in DB: node ./dev-data/data/import-dev-data.js --import

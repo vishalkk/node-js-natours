@@ -12,7 +12,8 @@ router.post('/login', authController.login);
 
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
-
+//to protect all routes below this using authController.protect middleware
+// router.use(authController.protect);
 router.patch(
   '/updatePassword',
   authController.protect,
@@ -30,6 +31,8 @@ router.delete('/deleteMe', authController.protect, userController.deleteMe);
 
 //permanently delete user
 router.delete('/deleteUser', authController.protect, userController.deleteUser);
+// route below this requires admin role
+// router.use(authController.restrictTo('admin'));
 router
   .route('/')
   .get(userController.getAllUsers)
