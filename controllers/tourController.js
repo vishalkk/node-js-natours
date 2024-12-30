@@ -131,3 +131,39 @@ exports.getToursWithin = catchAsync(async (req, res) => {
     }
   });
 });
+
+exports.getDistances = catchAsync(async (req, res) => {
+  const { latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+  const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
+  const distances = [];
+  if (!lat || !lng) {
+    next(new AppError('Please provide latitude and longitude in the format lat,lng', 400));
+  }
+  for (let i = -100; i <= 100; i++) {
+    distances.push(i);
+  }
+  const radii = distances.map((distance) => {
+    return distance * multiplier;
+  }
+  );
+  const tours = await Tour.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [lng * 1, lat * 1]
+        },
+        distanceField: 'distance',
+        distanceMultiplier: multiplier,
+        spherical: true
+      }
+    },
+    {
+      $project: {
+        distance: 1,
+        name: 1
+      }
+    }]);
+  res.status(200).json({ status: 'success', data: { data: tours } });
+});
