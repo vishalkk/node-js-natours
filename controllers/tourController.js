@@ -13,24 +13,6 @@ exports.aliasTopTours = async (req, res, next) => {
 
 exports.getAllTours = factory.getAll(Tour);
 
-//   catchAsync(async (req, res) => {
-//   // EXECUTE QUERY
-//   const features = new ApiFeatures(Tour.find(), req.query)
-//     .filter()
-//     .sort()
-//     .limitFields()
-//     .pagination();
-//   const tours = await features.query;
-
-//   // const tours = await query;
-
-//   res.status(200).json({
-//     result: tours.length,
-//     status: 'success',
-//     data: { tours }
-//   });
-// });
-
 exports.getTour = factory.getOne(Tour, { path: 'reviews' });
 
 exports.createTour = factory.createOne(Tour);
@@ -122,6 +104,30 @@ exports.getMonthlyPlan = catchAsync(async (req, res) => {
     message: 'Stats fetched  successfully',
     data: {
       tour: plan
+    }
+  });
+});
+
+
+exports.getToursWithin = catchAsync(async (req, res) => {
+  const { distance, latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+// converting  to radiant
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+
+  if (!lat || !lng) {
+    next(new AppError('Please provide latitude and longitude in the format lat,lng', 400));
+  }
+
+  const tours = await Tour.find({
+    startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } }
+  });
+
+  res.status(200).json({
+    status: 'success',
+    results: tours.length,
+    data: {
+      data: tours
     }
   });
 });
