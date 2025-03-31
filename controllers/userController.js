@@ -3,7 +3,9 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
-
+const multer = require('multer');
+const sharp = require('sharp');
+// upload destination
 // exports.getAllUsers = catchAsync(async (req, res) => {
 //   const query = User.find({ active: { $ne: false } });
 
@@ -17,6 +19,62 @@ const factory = require('./handlerFactory');
 //     data: { users }
 //   });
 // });
+// const multerStorage = multer.diskStorage({
+  // destination: (req, file, cb) => {
+      // console.log('multerStorage');
+//
+    // cb(null, 'public/img/users');
+  // },
+  // filename: (req, file, cb) => {
+    // console.log('multerFilename');
+    // const ext = file.mimetype.split('/')[1];
+    // cb(null, `${req.user.id}-${Date.now()}.${ext}`);
+  // },
+// });
+
+const multerStorage = multer.memoryStorage();
+//Add description here
+const multerFilter = (req, file, cb) => {
+  console.log(file.mimetype);
+      console.log('filter');
+
+  // This function is used as a filter for multer middleware to accept only image files.
+  // It checks the mimetype of the uploaded file and uses a callback to determine if the file should be accepted or rejected.
+  if (file.mimetype.startsWith('image')) {
+        console.log('filetter pass');
+
+    cb(null, true);
+  } else {
+            console.log('filetter failed');
+
+    cb(new AppError('Only image files are allowed!'), false);
+  }
+};
+// const upload = multer({ dest: 'public/img/users' });
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+// middleware to upload user photo
+exports.userPhotoUpload = upload.single('photo');
+//
+exports.resizeUserPhoto = (req, res, next) => {
+  if (!req.file) return next;
+
+  req.file.filename = `${req.user.id}-${Date.now()}.jpeg`;
+
+  sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/users/${req.file.filename}`);
+
+  next();
+
+
+}
 
 const filterUser = (obj, ...allowedFields) => {
   const newObj = {};
@@ -30,6 +88,8 @@ const filterUser = (obj, ...allowedFields) => {
 
 // update the user by id
 exports.updateMe = catchAsync(async (req, res, next) => {
+
+
   //1. check password is not part of request body
   if (req.body.password) {
     return next(
@@ -41,6 +101,9 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   }
   // filter the allowed fields from request body
   const filteredBody = filterUser(req.body, 'name', 'email', 'age', 'gender');
+
+  if (req.file) filteredBody.photo = req.file.filename;
+
   //2. update the user according to user id
   await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true, // return the updated user instead of the old one

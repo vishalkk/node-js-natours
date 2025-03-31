@@ -1,6 +1,7 @@
 // const fs = require('fs');
 const express = require('express');
 
+
 //routes
 const router = express.Router();
 
@@ -25,10 +26,10 @@ router.get(
   userController.getMe,
   userController.getUser
 );
-router.patch('/updateMe', authController.protect, userController.updateMe);
+router.patch('/updateMe', authController.protect, userController.userPhotoUpload,  userController.resizeUserPhoto,userController.updateMe);
 
 router.delete('/deleteMe', authController.protect, userController.deleteMe);
-
+8
 //permanently delete user
 router.delete('/deleteUser', authController.protect, userController.deleteUser);
 // route below this requires admin role

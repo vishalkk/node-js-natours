@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Please provide your password'],
     select: false //this will not be returned in response
   },
-  photo: String,
+  photo: { type: String, default: 'default.jpg' },
   passwordConfirm: {
     type: String,
     required: [true, 'Please confirm your password'],
