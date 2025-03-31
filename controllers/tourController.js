@@ -3,6 +3,70 @@ const Tour = require('../models/tourModels');
 const catchAsync = require('../utils/catchAsync');
 // const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
+const multer = require('multer');
+const sharp = require('sharp');
+const multerStorage = multer.memoryStorage();
+//Add description here
+const multerFilter = (req, file, cb) => {
+  console.log(file.mimetype);
+      console.log('filter');
+
+  // This function is used as a filter for multer middleware to accept only image files.
+  // It checks the mimetype of the uploaded file and uses a callback to determine if the file should be accepted or rejected.
+  if (file.mimetype.startsWith('image')) {
+        console.log('filetter pass');
+
+    cb(null, true);
+  } else {
+            console.log('filetter failed');
+
+    cb(new AppError('Only image files are allowed!'), false);
+  }
+};
+// const upload = multer({ dest: 'public/img/users' });
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+
+exports.uploadTourImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name:'images', maxCount: 3 }
+]);
+
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
+  if (!req.files) {
+    return next();
+  }
+  const files = req.files;
+  //1.Coverimage
+  const imageCoverFilename = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+  await sharp(files.imageCover[0].buffer)
+  .resize(2000, 1333)
+  .toFormat('jpeg')
+  .jpeg({ quality: 90 })
+    .toFile(`public/img/tours/${imageCoverFilename}`);
+    //2.Images
+
+  req.body.images = [];
+  await Promise.all(
+    // req.body.imageCover = imageCoverFilename;
+
+  req.files.images.map(async (file, i) => {
+    const filename = `tour-${req.params.id}-${Date.now()}=${i + 1}.jpeg`;
+    await sharp(file.buffer)
+    .resize(2000, 1333)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/tours/${imageCoverFilename}`);
+
+    req.body.images.push(filename);
+  })
+);
+    next();
+});
 
 exports.aliasTopTours = async (req, res, next) => {
   req.query.limit = 5;
