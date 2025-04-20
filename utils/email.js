@@ -22,6 +22,13 @@ module.exports = class Email {
     // If the environment is test, use nodemailer
     if(process.env.NODE_ENV === 'production') {
     //send grid
+      // return nodemailer.createTransport({
+      //   service: 'SendGrid',
+      //   auth: {
+      //     user: process.env.SENDGRID_USERNAME,
+      //     pass: process.env.SENDGRID_PASSWORD
+      //   }
+      // });
       return 1;
     }
 
