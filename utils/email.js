@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const pug = require('pub');
+const pug = require('pug');
 const htmlToText = require('html-to-text');
 
 // Email class to send emails
@@ -49,7 +49,7 @@ module.exports = class Email {
       to: this.to,
       subject,
       html,
-      text: htmlToText.fromString(html)
+      text: htmlToText.convert(html)
     };
     //3. Create a transport and send email
     await this.newTransport().sendMail(mailOptions);

@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const sendEmail = require('../utils/email');
+const Email = require('../utils/email');
 
 const signToken = (id) =>
   // generate token with user id
@@ -45,6 +45,21 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
     role: req.body.role || 'user'
   });
+
+  // explian why we are using this
+ 
+/**
+ * Constructs a URL pointing to the "me" page of the current host.
+ * 
+ * The URL is dynamically generated using the request's protocol (HTTP or HTTPS)
+ * and the host information from the request headers. This ensures that the URL
+ * is accurate and reflects the current environment (e.g., development, production).
+ * 
+ * @constant {string} url - The fully qualified URL to the "me" page.
+ */
+const url = `${req.protocol}://${req.get('host')}/me`;
+  // sending welcome email
+  await new Email(newUser, url).sendWelcome();
   // generating token
   createSendToken(newUser, 201, res);
 });
@@ -141,12 +156,12 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
   const message = `You have requested to reset your password. Click on the following link to reset your password: ${resetUrl}`;
   try {
-    console.log('Sending email to:', user.email);
-    await sendEmail({
-      email: user.email,
-      subject: 'Password Reset Token (valid for 10 minutes)',
-      text: message
-    });
+    // console.log('Sending email to:', user.email);
+    // await sendEmail({
+    //   email: user.email,
+    //   subject: 'Password Reset Token (valid for 10 minutes)',
+    //   text: message
+    // });
 
     res.status(200).json({
       status: 'success',
