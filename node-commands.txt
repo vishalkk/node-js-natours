@@ -15,3 +15,4 @@ open the application: heroku open
 check heroku logs: heroku logs --tail
 
 setting env varialbe on heroku: heroku config:set NODE_ENV=production
+rename heroku app: heroku apps:rename natours-vishal 
