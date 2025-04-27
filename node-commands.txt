@@ -3,3 +3,15 @@ run dev environment: npm run start:dev
 run script to Delete data in DB: node ./dev-data/data/import-dev-data.js --delete
 
 run script to import data in DB: node ./dev-data/data/import-dev-data.js --import
+
+
+
+
+#HEROKU COMMANDS
+loign to heroku: heroku login
+Create app on heroku: heroku create 
+deploy the app on heroku: git push heroku main
+open the application: heroku open
+check heroku logs: heroku logs --tail
+
+setting env varialbe on heroku: heroku config:set NODE_ENV=production

@@ -34,9 +34,7 @@
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
-    "mongoose": "^8.8.0",
-    "ndb": "^0.2.4",
-    "nodemailer": "^6.9.16"
+    "ndb": "^0.2.4"
   },
   "engines": {
     "node": ">=20.0.0"
