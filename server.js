@@ -2,7 +2,6 @@
 const mongoose = require('mongoose'); // Add this line to require mongoose
 const compression = require('compression');
 const dotenv = require('dotenv');
-app.use(compression());
 process.on('uncaughtException', (err) => {
   console.log(err.name, err.message);
   process.exit(1);

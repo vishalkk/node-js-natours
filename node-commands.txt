@@ -16,3 +16,5 @@ check heroku logs: heroku logs --tail
 
 setting env varialbe on heroku: heroku config:set NODE_ENV=production
 rename heroku app: heroku apps:rename natours-vishal 
+check the dynos running: heroku ps 
+restart the dynos: heroku ps:restart

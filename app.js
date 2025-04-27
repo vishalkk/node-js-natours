@@ -12,6 +12,8 @@ const reviewRouter = require('./routes/reviewRoutes');
 const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
+app.use(compression());
+
 app.enable('trust proxy'); // for heroku
 // 1) GLOBAL MIDDLEWARES
 //middleware
